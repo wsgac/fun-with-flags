@@ -1,4 +1,4 @@
-(defvar *flag-url* "https://en.wikipedia.org/wiki/Gallery_of_sovereign_state_flags")
+(defvar *image-path* "images")
 
 (defvar *countries-by-continent*
   (list
@@ -62,3 +62,26 @@
 ;;  for (continent . countries) in *countries-by-continent*
 ;;  do (incf count (length countries))
 ;;  finally (return count))
+
+;;;;;;;;;;;;;;;;;;;;;;
+;; Helper functions ;;
+;;;;;;;;;;;;;;;;;;;;;;
+(defun fwf:country-to-filename (country)
+  (format "%s.png" (mapconcat #'downcase (split-string country) "_")))
+
+(defun fwf:get-flag-image (country)
+  (let* ((filename (fwf:country-to-filename country))
+	 (image-path (expand-file-name filename *image-path*)))
+    (message "File: %s" image-path)
+    (create-image image-path)))
+
+(defun fwf:create-buffer-with-image (country)
+  ""
+  (interactive "sCountry: ")
+  (with-current-buffer (generate-new-buffer country)
+    (let ((image (fwf:get-flag-image country)))
+      (iimage-mode)
+      (iimage-mode-buffer t)
+      (insert-image image)
+      (local-set-key (kbd "q") 'kill-this-buffer)
+      (switch-to-buffer (current-buffer)))))
